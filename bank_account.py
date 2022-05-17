@@ -1,5 +1,25 @@
 import getpass
-
+def read_acc():
+    with open("bank.csv", mode="r") as bank_file:
+        for line in bank_file.readlines():
+            accounts.append(line.split(","))
+    return(accounts)
+def save_acc(accounts):
+    with open("bank.csv", mode="w") as bank_file:
+        i = 0
+        while i < len(accounts):
+            bank_file.write(f"{accounts[i][0]},{accounts[i][1]},{accounts[i][2]},{accounts[i][3]}")
+            i += 1
+def read_loan():
+    with open("loan.csv", mode="r") as loan_file:
+        for line in loan_file.readlines():
+            loans.append(line.split(","))
+    return(loans)
+def save_loan(i,loan,rate,period):
+    with open("loan.csv", mode="a") as loan_file:
+        loan_file.write(f"{accounts[i][3].strip()},{loan},{rate},{period}\n")
+        print(f"{accounts[i][3].strip()},{loan},{rate},{period}\n")
+        
 def authorization():
     us_ps = [input("Enter your name: "), getpass.getpass("Enter you password: ")]
     j = 0
@@ -40,29 +60,35 @@ def user(i):
 def see(i):
     print(f"You have {accounts[i][2]}$ in your account")
     j = 0
+    counter = 0
     while j < len(loans):
-        if accounts[i][3] == loans[j][0]:
-            print(f"You have a loan of {loans[j][1]}$")
+        if accounts[i][3].strip() == loans[j][0].strip():
+            counter += 1
+            print(f"A loan for {loans[j][1]}$ with rate {loans[j][2]}% for {loans[j][3].strip()} months")
         j += 1
+    print(f'\tYou have total of {counter} loans')
     user(i)
 def withdraw(i):
-    amount = int(input("Please, enter an amount: "))
-    accounts[i][2] = int(accounts[i][2]) - amount
+    amount = float(input("Please, enter an amount: "))
+    accounts[i][2] = float(accounts[i][2]) - amount
     print(f"{accounts[i][2]}$ left in your account")
+    save_acc(accounts)
     user(i)
 def put(i):
-    amount = int(input("Please, enter an amount: "))
-    accounts[i][2] = int(accounts[i][2]) + amount
+    amount = float(input("Please, enter an amount: "))
+    accounts[i][2] = float(accounts[i][2]) + amount
     print(f"{accounts[i][2]}$ left in your account")
+    save_acc(accounts)
     user(i)
 def transfer(i):
     recipient = input("Please, enter a name: ")
-    amount = int(input("Please, enter an amount: "))
+    amount = float(input("Please, enter an amount: "))
     for recip in accounts:
         if recip[0] == recipient:
-            accounts[i][2] = int(accounts[i][2]) - amount
-            recip[2] = int(recip[2]) + amount
+            accounts[i][2] = float(accounts[i][2]) - amount
+            recip[2] = float(recip[2]) + amount
     print(f"{accounts[i][2]}$ left in your account")
+    save_acc(accounts)
     user(i)
 def loan_calc(i):
     loan = float(input("Enter a loan amount, please: "))
@@ -86,15 +112,18 @@ def take_ln(i,loan,rate,period):
     print(f"""Congratulations, your account has been credited with {loan}$!
     You have {accounts[i][2]}$ in your account
     """)
+    save_loan(i,loan,rate,period)
+    save_acc(accounts)
     user(i)
 def change_pas(i):
     pas = input("Please, confirm you password: ")
     if pas == accounts[i][1]:
         accounts[i][1] = input("Enter a new password: ")
+    save_acc(accounts)
     user(i)
-accounts = [
-    ["Alex", "12345", 1500,100],
-    ["Eugene", "123456", 1500,101]
-    ]
+accounts = []
 loans = []
+read_acc()
+read_loan()
 authorization()
+
